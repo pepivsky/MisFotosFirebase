@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MisFotos</string>
+    <string name="txt_bottom_navigation_galeria">Galería</string>
+    <string name="txt_bottom_navigation_camara">Cámara</string>
+    <string name="label_Subir">Subir</string>
+    <string name="main_pregunta_subir">¿Desea subir esta imagen?</string>
+
+</resources>

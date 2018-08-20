@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.view.MenuItem;
@@ -16,8 +17,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 
@@ -89,6 +95,18 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        inicializarFirebase();
+    }
+
+    private void inicializarFirebase() {
+        mstorageReference = FirebaseStorage.getInstance().getReference();
+        //Instancia de la base de datos
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //Nos ubicamos en el nodo Profile en la base de datos  y añadimos la url
+        mdatabaseReference = database.getReference().child(PATH_PROFILE).child(PATH_PHOTO_URL);
+
+
     }
 
     //Seleccionar foto de la galeria
@@ -129,7 +147,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Método para Subir foto
     @OnClick(R.id.btnSubir)
     public void onViewClicked() {
+        //Subir foto
+        //Referencia
+        StorageReference Profilereference = mstorageReference.child(PATH_PROFILE);
+
+        //Creacion de carpetas - ruta
+        StorageReference photoReference = Profilereference.child(MY_PHOTO);
+
+        photoReference.putFile(mPhotoSelectedUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Snackbar.make(container, R.string.mensaje_subida_exitosa, Snackbar.LENGTH_LONG).show();
+                Uri downloadUri = taskSnapshot.getDownloadUrl();
+
+                //Método que recibe la url
+                GuardarFotoUrl(downloadUri);
+                //Habilitar botton de eliminar
+                btnBorrar.setVisibility(View.VISIBLE);
+                mTextMessage.setText(R.string.mensaje_hecho);
+            }
+            //Listener en caso de que faller
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //SnackBar
+                Snackbar.make(container,R.string.mensaje_subida_error, Snackbar.LENGTH_LONG ).show();
+            }
+        });
+
+    }
+
+    //Método que recibe la url para guardar la foto
+    private void GuardarFotoUrl(Uri downloadUri) {
+        mdatabaseReference.setValue(downloadUri.toString());
     }
 }

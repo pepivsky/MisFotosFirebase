@@ -4,5 +4,8 @@
     <string name="txt_bottom_navigation_camara">Cámara</string>
     <string name="label_Subir">Subir</string>
     <string name="main_pregunta_subir">¿Desea subir esta imagen?</string>
+    <string name="mensaje_subida_exitosa">Imagen subida exitosa</string>
+    <string name="mensaje_hecho">Listo!</string>
+    <string name="mensaje_subida_error">Error al subir imagen :(</string>
 
 </resources>

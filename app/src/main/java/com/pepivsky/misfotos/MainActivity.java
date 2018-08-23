@@ -33,8 +33,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final  int RC_GALLERY = 21;
-    private static final  int RC_CAMERA = 22;
+    private static final int RC_GALLERY = 21;
+    private static final int RC_CAMERA = 22;
 
     private static final int RP_CAMERA = 121;
     private static final int RP_STORAGE = 122;
@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String PATH_PROFILE = "profile";
     private static final String PATH_PHOTO_URL = "photoUrl";
-
-
 
 
     @BindView(R.id.btnSubir)
@@ -86,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,11 +118,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK){
-            switch (requestCode){
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
 
                 case RC_GALLERY:
-                    if (data != null){
+                    if (data != null) {
                         mPhotoSelectedUri = data.getData();
                         try {
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),
@@ -138,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
 
-
-
                 case RC_CAMERA:
                     break;
 
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Método para Subir foto
     @OnClick(R.id.btnSubir)
-    public void onViewClicked() {
+    public void onClicSubirFoto() {
         //Subir foto
         //Referencia
         StorageReference Profilereference = mstorageReference.child(PATH_PROFILE);
@@ -174,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 //SnackBar
-                Snackbar.make(container,R.string.mensaje_subida_error, Snackbar.LENGTH_LONG ).show();
+                Snackbar.make(container, R.string.mensaje_subida_error, Snackbar.LENGTH_LONG).show();
             }
         });
 
@@ -183,5 +180,25 @@ public class MainActivity extends AppCompatActivity {
     //Método que recibe la url para guardar la foto
     private void GuardarFotoUrl(Uri downloadUri) {
         mdatabaseReference.setValue(downloadUri.toString());
+    }
+
+    //Eliminar foto de firebase Storage
+    @OnClick(R.id.btnBorrar)
+    public void onclicBorrarFoto() {
+        mstorageReference.child(PATH_PROFILE).child(MY_PHOTO).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                mdatabaseReference.removeValue();//Eliminar Url de la BD
+                imgFoto.setImageBitmap(null);
+                btnBorrar.setVisibility(View.GONE);
+                Snackbar.make(container, R.string.mensaje_borrado_exitoso, Snackbar.LENGTH_LONG).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Snackbar.make(container, R.string.mensaje_borrado_error, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 }

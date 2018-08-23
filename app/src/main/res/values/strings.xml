@@ -7,5 +7,7 @@
     <string name="mensaje_subida_exitosa">Imagen subida exitosa</string>
     <string name="mensaje_hecho">Listo!</string>
     <string name="mensaje_subida_error">Error al subir imagen :(</string>
+    <string name="mensaje_borrado_exitoso">Imagen eliminada correctamente</string>
+    <string name="mensaje_borrado_error">Error al eliminar</string>
 
 </resources>

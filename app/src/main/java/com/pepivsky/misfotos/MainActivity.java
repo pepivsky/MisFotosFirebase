@@ -17,10 +17,16 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         inicializarFirebase();
+
     }
 
     private void inicializarFirebase() {
@@ -104,6 +111,69 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         //Nos ubicamos en el nodo Profile en la base de datos  y añadimos la url
         mdatabaseReference = database.getReference().child(PATH_PROFILE).child(PATH_PHOTO_URL);
+
+
+    }
+
+    //Cargar Imagen
+    private void configurarFotoPerfil() {
+        /*Obtener imagen de storage
+        mstorageReference.child(PATH_PROFILE).child(MY_PHOTO).getDownloadUrl()
+                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        //Guarda la imagen original y la procesada, para consultar el archivo en caché
+                        final RequestOptions options = new RequestOptions().centerCrop()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL);
+
+                        configurarFotoPerfil();
+
+                        //Imagen que se carga al inicio desde una url
+                        //Glide
+                        Glide.with(MainActivity.this)
+                                .load(uri)
+                                .apply(options)
+                                .into(imgFoto);
+
+                        btnBorrar.setVisibility(View.VISIBLE);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        btnBorrar.setVisibility(View.GONE);
+                        Snackbar.make(container, R.string.mensaje_error_imagen,
+                        Snackbar.LENGTH_LONG).show();
+                    }
+                });*/
+        //Obtener imagen de realtimeDataBase con la url
+        mdatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final RequestOptions options = new RequestOptions().centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL);
+
+                configurarFotoPerfil();
+
+                //Imagen que se carga al inicio desde una url
+                //Glide
+                Glide.with(MainActivity.this)
+                        .load(dataSnapshot.getValue())
+                        .apply(options)
+                        .into(imgFoto);
+
+                btnBorrar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                btnBorrar.setVisibility(View.GONE);
+                Snackbar.make(container, R.string.mensaje_error_imagen,
+                        Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+
 
 
     }

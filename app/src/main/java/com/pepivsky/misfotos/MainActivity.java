@@ -183,6 +183,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, RC_GALLERY);
     }
+    //Seleccionar  la imagen desde la camara
+    private void fromCamera(){
+        //Lanzar la cámara
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, RC_CAMERA);
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -208,6 +215,12 @@ public class MainActivity extends AppCompatActivity {
 
 
                 case RC_CAMERA:
+                    //Extraer miniatura
+                    Bundle extras = data.getExtras();
+                    Bitmap bitmap = (Bitmap)extras.get("data");
+                    imgFoto.setImageBitmap(bitmap);
+                    btnBorrar.setVisibility(View.GONE);
+
                     break;
 
             }
